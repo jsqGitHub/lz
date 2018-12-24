@@ -1,0 +1,230 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.zking.lz.mapper.BookMapper" >
+  <resultMap id="BaseResultMap" type="Book" >
+    <constructor >
+      <idArg column="id" jdbcType="INTEGER" javaType="java.lang.Integer" />
+      <arg column="bookname" jdbcType="VARCHAR" javaType="java.lang.String" />
+      <arg column="price" jdbcType="REAL" javaType="java.lang.Float" />
+      <arg column="booktype" jdbcType="VARCHAR" javaType="java.lang.String" />
+    </constructor>
+  </resultMap>
+  <resultMap id="rows" type="Book" >
+    <id column="id" property="id" javaType="java.lang.Integer" />
+    <result column="bookname" property="bookname" javaType="java.lang.String" />
+    <result column="booktype" property="booktype" javaType="java.lang.String" />
+    <result column="price" property="price" javaType="java.lang.Float"/>
+  </resultMap>
+  <sql id="Base_Column_List" >
+    id, bookname, price, booktype
+  </sql>
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from book
+    where id = #{id,jdbcType=INTEGER}
+  </select>
+  <select id="queryBookByIds" resultType="book" parameterType="com.zking.lz.vo.BookVo">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM book
+    where 1=1 and id in
+    <foreach collection="ids" item="bid" open="(" close=")" separator="," index="i">
+      #{bid}
+    </foreach>
+
+  </select>
+  <select id="queryBookLike" resultType="book" parameterType="book">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM book
+    WHERE 1=1
+    <if test="null!=bookname and ''!=bookname">
+      and bookname like concat(concat('%',#{bookname}),'%')
+    </if>
+
+  </select>
+  <select id="queryBookResultMap" resultMap="BaseResultMap">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM book
+
+  </select>
+  <select id="queryBook" resultMap="rows">
+    select
+    id,bookname,price
+    FROM book
+  </select>
+  <select id="queryBookDg" resultType="book" parameterType="book">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM book
+    where 1=1
+    and id = #{id}
+
+  </select>
+  <select id="queryBookMap" resultType="map">
+    select
+    <include refid="Base_Column_List"/>
+    FROM  book
+
+  </select>
+  <select id="queryBookMapDg" resultType="map">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM book
+    where id = 6
+
+  </select>
+  <select id="queryBookPage" resultType="book" parameterType="book">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM book
+    where 1=1
+    <if test="null!=bookname and ''!=bookname">
+      and bookname like concat(concat('%',#{bookname}),'%')
+    </if>
+
+  </select>
+  <select id="querBookPrice" resultType="book" parameterType="com.zking.lz.vo.BookVo">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM book
+    where price&gt;=#{min} and price&lt;=#{max}
+
+  </select>
+  <select id="queryMakBook" resultType="map" parameterType="com.zking.lz.vo.BookVo">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM book
+    where 1=1 and id in
+    <foreach collection="ids" item="bid" open="(" close=")" separator="," index="i">
+      #{bid}
+    </foreach>
+
+  </select>
+  <select id="queryChoose" resultType="book" parameterType="book">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM book
+    WHERE 1=1
+    <choose>
+      <when test="null!=bookname and ''!=bookname">
+          AND  bookname LIKE concat(concat('%',#{bookname}),'%')
+      </when>
+      <when test="null!=price and ''!=price">
+          AND price = #{price}
+      </when>
+
+    </choose>
+
+  </select>
+  <select id="delBook" resultType="int" parameterType="com.zking.lz.vo.BookVo">
+    DELETE FROM book WHERE
+    id in
+    <foreach collection="ids" item="bid" open="(" close=")" separator="," index="i">
+      #{bid}
+    </foreach>
+  </select>
+  <select id="addBook" parameterType="com.zking.lz.vo.BookVo">
+    INSERT  INTO  book
+    (bookname,price,booktype)
+    VALUES
+    <foreach collection="lstBook" item="lst" separator=","   index="i">
+      (
+        #{lst.bookname},
+        #{lst.price},
+        #{lst.booktype}
+      )
+    </foreach>
+
+  </select>
+  <select id="queryMakBooks" resultType="map" parameterType="com.zking.lz.vo.BookVo">
+    <foreach collection="lstMap" item="bid" index="i">
+    SELECT
+    <include refid="Base_Column_List"/>
+    FROM book
+    where 1=1 and id in
+      <foreach collection="bid" item="a"  open="(" close=")" separator=",">
+        #{a}
+      </foreach>
+    </foreach>
+
+  </select>
+  <select id="updBook" parameterType="com.zking.lz.vo.BookVo">
+    UPDATE book
+    set
+    bookname = 'ok'
+    where id IN
+    <foreach collection="lstBook" item="lst" open="(" close=")" separator="," index="i">
+      #{lst.id}
+
+    </foreach>
+
+
+  </select>
+
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Integer" >
+    delete from book
+    where id = #{id,jdbcType=INTEGER
+  </delete>
+  <insert id="insert" parameterType="com.zking.lz.model.Book" >
+    insert into book (id, bookname, price, 
+      booktype)
+    values (#{id,jdbcType=INTEGER}, #{bookname,jdbcType=VARCHAR}, #{price,jdbcType=REAL}, 
+      #{booktype,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.zking.lz.model.Book" >
+    insert into book
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        id,
+      </if>
+      <if test="bookname != null" >
+        bookname,
+      </if>
+      <if test="price != null" >
+        price,
+      </if>
+      <if test="booktype != null" >
+        booktype,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="id != null" >
+        #{id,jdbcType=INTEGER},
+      </if>
+      <if test="bookname != null" >
+        #{bookname,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null" >
+        #{price,jdbcType=REAL},
+      </if>
+      <if test="booktype != null" >
+        #{booktype,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <update id="updateByPrimaryKeySelective" parameterType="com.zking.lz.model.Book" >
+    update book
+    <set >
+      <if test="bookname != null" >
+        bookname = #{bookname,jdbcType=VARCHAR},
+      </if>
+      <if test="price != null" >
+        price = #{price,jdbcType=REAL},
+      </if>
+      <if test="booktype != null" >
+        booktype = #{booktype,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.zking.lz.model.Book" >
+    update book
+    set bookname = #{bookname,jdbcType=VARCHAR},
+      price = #{price,jdbcType=REAL},
+      booktype = #{booktype,jdbcType=VARCHAR}
+    where id = #{id,jdbcType=INTEGER}
+  </update>
+</mapper>
